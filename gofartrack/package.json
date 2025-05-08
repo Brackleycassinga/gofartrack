@@ -1,0 +1,58 @@
+{
+  "name": "gofartrack",
+  "productName": "Go Far Construction Tracker",
+  "version": "1.0.0",
+  "description": "Construction site management and cost tracking system",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "start:prod": "yarn build:css && yarn build:react && yarn start",
+    "package": "yarn build:css && yarn build:react && electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\"",
+    "build:css": "tailwindcss -i ./src/styles/input.css -o ./src/styles/output.css",
+    "watch:css": "tailwindcss -i ./src/styles/input.css -o ./src/styles/output.css --watch",
+    "build:react": "webpack --config webpack.config.js",
+    "dev": "concurrently \"yarn watch:css\" \"yarn watch\" \"yarn start\"",
+    "watch": "webpack --config webpack.config.js --watch"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Bracklaye Cassinga",
+    "email": "pcassinga@gmail.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@heroicons/react": "^2.0.18",
+    "axios": "^1.6.7",
+    "electron-squirrel-startup": "^1.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.22.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-react": "^7.23.9",
+    "@electron-forge/cli": "^7.8.0",
+    "@electron-forge/maker-deb": "^7.8.0",
+    "@electron-forge/maker-rpm": "^7.8.0",
+    "@electron-forge/maker-squirrel": "^7.8.0",
+    "@electron-forge/maker-zip": "^7.8.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.0",
+    "@electron-forge/plugin-fuses": "^7.8.0",
+    "@electron/fuses": "^1.8.0",
+    "autoprefixer": "^10.4.17",
+    "babel-loader": "^9.1.3",
+    "concurrently": "^8.2.2",
+    "electron": "36.1.0",
+    "electron-reload": "^2.0.0",
+    "file-loader": "^6.2.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
