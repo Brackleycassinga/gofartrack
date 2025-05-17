@@ -1,0 +1,16 @@
+Copyright © 2025 Kwanza Technologies - Brackley Cassinga
+
+goFarTrack Construction Management CRM
+
+All rights reserved.
+
+This software and associated documentation files are the proprietary property
+of Kwanza Technologies and Brackley Cassinga. Unauthorized copying, distribution,
+modification, or use of this software, either in source or binary form, is
+strictly prohibited without prior written consent.
+
+This software is designed to assist construction businesses in managing their
+sites, projects, employees, and payment processes. It is provided "as is"
+without warranty of any kind, either expressed or implied.
+
+For licensing inquiries, please contact: pcassinga@gmail.com

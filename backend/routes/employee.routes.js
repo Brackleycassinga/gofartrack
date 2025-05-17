@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const Employee = require("../models/Employee");
 const auth = require("../middleware/auth");
+const Employee = require("../models/Employee");
+const { EMPLOYEE_POSITIONS } = require("../utils/employeeConstants");
 
 // Get all employees
 router.get("/", auth, async (req, res) => {
@@ -13,7 +14,7 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// Add new employee with improved error handling
+// Add new employee with position validation
 router.post("/", auth, async (req, res) => {
   try {
     console.log("Received employee data:", req.body);
@@ -22,6 +23,30 @@ router.post("/", auth, async (req, res) => {
     if (!req.body.name || !req.body.nationalId || !req.body.payRate) {
       return res.status(400).json({
         message: "Missing required fields",
+      });
+    }
+
+    // Validate the position is valid for the selected category
+    const category = req.body.category;
+    const position = req.body.position;
+
+    if (!category) {
+      return res.status(400).json({
+        message: "Employee category is required",
+      });
+    }
+
+    if (!position) {
+      return res.status(400).json({
+        message: "Employee position is required",
+      });
+    }
+
+    // Check if the position exists in the selected category
+    const validPositionsForCategory = EMPLOYEE_POSITIONS[category] || [];
+    if (!validPositionsForCategory.includes(position)) {
+      return res.status(400).json({
+        message: `Position '${position}' is not valid for category '${category}'`,
       });
     }
 

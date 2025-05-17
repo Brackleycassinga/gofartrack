@@ -44,10 +44,17 @@ const paymentSchema = new mongoose.Schema(
     },
     projectReference: String,
     siteReference: String,
+    // Add position and employeeType fields for filtering payments
+    position: String,
+    employeeType: String,
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Payment", paymentSchema);
+// IMPORTANT: Prevent overwriting the model by checking if it already exists
+const Payment =
+  mongoose.models.Payment || mongoose.model("Payment", paymentSchema);
+
+module.exports = Payment;
