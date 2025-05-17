@@ -6,10 +6,28 @@ const auth = require("../middleware/auth");
 // Create a new report
 router.post("/", auth, async (req, res) => {
   try {
+    const { projectId, title, progress, date, text } = req.body;
+
+    // Basic validation
+    if (!projectId)
+      return res.status(400).json({ message: "projectId is required" });
+    if (!title?.trim())
+      return res.status(400).json({ message: "title is required" });
+    if (typeof progress !== "number" || progress < 0 || progress > 100) {
+      return res.status(400).json({ message: "progress must be 0–100" });
+    }
+    if (!text?.trim())
+      return res.status(400).json({ message: "text is required" });
+
     const report = new Report({
-      ...req.body,
-      createdBy: req.user.id
+      projectId,
+      title: title.trim(),
+      progress,
+      date: date ? new Date(date) : undefined,
+      text,
+      createdBy: req.user.id,
     });
+
     const savedReport = await report.save();
     res.status(201).json(savedReport);
   } catch (error) {
@@ -21,8 +39,10 @@ router.post("/", auth, async (req, res) => {
 router.get("/", auth, async (req, res) => {
   try {
     const reports = await Report.find()
+      .select("projectId date title progress createdBy")
       .populate("projectId", "name")
-      .populate("createdBy", "name");
+      .populate("createdBy", "name")
+      .sort({ date: -1 });
     res.json(reports);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -33,6 +53,7 @@ router.get("/", auth, async (req, res) => {
 router.get("/project/:projectId", auth, async (req, res) => {
   try {
     const reports = await Report.find({ projectId: req.params.projectId })
+      .select("projectId date title progress createdBy")
       .populate("projectId", "name")
       .populate("createdBy", "name")
       .sort({ date: -1 });
@@ -45,18 +66,18 @@ router.get("/project/:projectId", auth, async (req, res) => {
 // Get reports by date
 router.get("/date/:date", auth, async (req, res) => {
   try {
-    // Create date objects for start and end of the specified day
     const startDate = new Date(req.params.date);
     startDate.setHours(0, 0, 0, 0);
-    
     const endDate = new Date(req.params.date);
     endDate.setHours(23, 59, 59, 999);
-    
-    const reports = await Report.find({ 
-      date: { $gte: startDate, $lte: endDate } 
+
+    const reports = await Report.find({
+      date: { $gte: startDate, $lte: endDate },
     })
+      .select("projectId date title progress createdBy")
       .populate("projectId", "name")
-      .populate("createdBy", "name");
+      .populate("createdBy", "name")
+      .sort({ date: -1 });
     res.json(reports);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -66,24 +87,24 @@ router.get("/date/:date", auth, async (req, res) => {
 // Update a report
 router.put("/:id", auth, async (req, res) => {
   try {
+    const { title, progress, date, text } = req.body;
     const report = await Report.findById(req.params.id);
-    
-    if (!report) {
-      return res.status(404).json({ message: "Report not found" });
+    if (!report) return res.status(404).json({ message: "Report not found" });
+
+    if (
+      report.createdBy.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({ message: "Not authorized" });
     }
-    
-    // Check if user is the creator or admin
-    if (report.createdBy.toString() !== req.user.id && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Not authorized to update this report" });
-    }
-    
-    const updatedReport = await Report.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    
-    res.json(updatedReport);
+
+    if (title?.trim()) report.title = title.trim();
+    if (typeof progress === "number") report.progress = progress;
+    if (date) report.date = new Date(date);
+    if (text?.trim()) report.text = text;
+
+    const updated = await report.save();
+    res.json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -93,17 +114,16 @@ router.put("/:id", auth, async (req, res) => {
 router.delete("/:id", auth, async (req, res) => {
   try {
     const report = await Report.findById(req.params.id);
-    
-    if (!report) {
-      return res.status(404).json({ message: "Report not found" });
+    if (!report) return res.status(404).json({ message: "Report not found" });
+
+    if (
+      report.createdBy.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({ message: "Not authorized" });
     }
-    
-    // Check if user is the creator or admin
-    if (report.createdBy.toString() !== req.user.id && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Not authorized to delete this report" });
-    }
-    
-    await Report.findByIdAndDelete(req.params.id);
+
+    await report.remove();
     res.json({ message: "Report deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
