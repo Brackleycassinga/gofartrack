@@ -18,6 +18,7 @@ const siteRoutes = require("./routes/site.routes");
 const contractorRoutes = require("./routes/contractor.routes");
 const reportRoutes = require("./routes/report.route");
 const userRoutes = require("./routes/user.routes"); // Add user routes
+const attendanceRoutes = require("./routes/attendance.routes");
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use("/sites", siteRoutes);
 app.use("/contractors", contractorRoutes);
 app.use("/reports", reportRoutes);
 app.use("/users", userRoutes); // Register user routes
+app.use("/attendances", attendanceRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

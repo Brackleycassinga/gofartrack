@@ -15,7 +15,7 @@ const siteRoutes = require("./routes/site.routes");
 const contractorRoutes = require("./routes/contractor.routes");
 const reportRoutes = require("./routes/report.route");
 const userRoutes = require("./routes/user.routes");
-
+const attendanceRoutes = require("./routes/attendance.routes");
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -42,6 +42,7 @@ app.use("/api/sites", siteRoutes);
 app.use("/api/contractors", contractorRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/users", userRoutes); // Register user routes
+app.use("/api/attendances", attendanceRoutes);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, "client/build")));
